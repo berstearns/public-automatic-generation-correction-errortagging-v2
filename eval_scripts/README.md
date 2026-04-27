@@ -35,6 +35,39 @@ python -m eval_scripts.run_all_tables \
     --out_dir tables/
 ```
 
+## Online vs offline modes
+
+Two equivalent ways to feed an eval script:
+
+**Offline** — start from any existing `predictions.jsonl` or
+`raw_results.json`:
+
+```bash
+python -m eval_scripts.eval_perplexity_table \
+    --input runs/2026-04-27_celva/predictions.jsonl \
+    --out tables/perplexity.csv
+```
+
+**Online** — produce the JSONL on the fly from a model + a CSV of
+sentences, then feed it to any eval script:
+
+```bash
+# requires: pip install transformers torch
+python -m eval_scripts.predict_online \
+    --model gpt2 \
+    --data data/sentences.csv --column sentence \
+    --model_name_label gpt2-native-zero-shot \
+    --out predictions.jsonl
+
+python -m eval_scripts.eval_perplexity_table \
+    --input predictions.jsonl --out tables/perplexity.csv
+```
+
+`predict_online` only fills the `ppl` field. ERRANT-derived fields
+(`errors`, `error_types`) require running the full pipeline; the
+output of that run can be converted with
+`python -m eval_scripts.raw_to_jsonl --input raw_results.json --out predictions.jsonl`.
+
 ## Adding a new table
 
 1. Create `eval_scripts/eval_<name>_table.py`.
