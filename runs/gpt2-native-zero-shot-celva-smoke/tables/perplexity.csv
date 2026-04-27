@@ -1,0 +1,2 @@
+model,dataset,n,ppl_mean,ppl_median,ppl_std,ppl_25th,ppl_75th
+gpt2-native-zero-shot,CELVA-SP-2sample,2,112.17589043559556,112.17589043559556,91.94064079912496,79.66996514774665,144.68181572344446

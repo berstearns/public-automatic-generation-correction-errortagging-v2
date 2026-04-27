@@ -19,6 +19,7 @@ checkpoint/
 *.tsv
 *.csv
 !configs/**
+!runs/**
 .ipynb_checkpoints/
 
 # Additional public-mirror exclusions
