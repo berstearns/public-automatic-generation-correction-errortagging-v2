@@ -1,8 +1,9 @@
 # eval_scripts/
 
-Standalone evaluation scripts. Each script consumes one
-`raw_results.json` produced by `gen_gec_errant.pipeline` and emits one
-CSV table corresponding to one paper-ready figure.
+Standalone evaluation scripts. Each script consumes one input file
+(either `raw_results.json` from the pipeline or a `predictions.jsonl`
+matching the schema below) and emits one CSV table corresponding to
+one paper-ready figure.
 
 These scripts depend only on the Python standard library, so they can
 be run on a machine that does not have the full `gen_gec_errant`
@@ -43,9 +44,33 @@ python -m eval_scripts.run_all_tables \
 5. Add the script to the orchestrator in `run_all_tables.py`.
 6. Update the table in this README.
 
-## Schema reference
+## Input formats
 
-`raw_results.json` is a dict keyed by model name. Each value contains
-`perplexities`, `error_summary`, `annotations`, and optionally
-`full_text_error_summary` and `region_error_summary`. See
-`eval_scripts/_io.py` for the full shape.
+Eval scripts auto-detect the input format from the file extension:
+
+- `raw_results.json` — pipeline output. Dict keyed by model name; each
+  value contains `perplexities`, `error_summary`, `annotations`, and
+  optionally `full_text_error_summary` / `region_error_summary`.
+- `predictions.jsonl` — line-delimited JSON, one record per
+  (model, item):
+
+  ```jsonl
+  {"model": "<name>", "item_id": <int>, "ppl": <float|null>, "errors": <int|null>, "error_types": [<str>, ...]}
+  ```
+
+  All fields except `model` are optional; missing values do not
+  contribute to the corresponding aggregate. New prediction scripts
+  should emit JSONL directly so per-item ERRANT codes (`error_types`)
+  are preserved.
+
+Convert one to the other with:
+
+```bash
+python -m eval_scripts.raw_to_jsonl --input raw_results.json --out predictions.jsonl
+```
+
+(The reverse — JSONL → raw_results.json — is just `load_input(...)`
+in Python; eval scripts call it on every run, so explicit conversion
+is rarely needed.)
+
+See `eval_scripts/_io.py` for the canonical schema definitions.

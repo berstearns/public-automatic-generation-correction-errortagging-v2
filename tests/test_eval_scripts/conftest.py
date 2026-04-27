@@ -44,3 +44,23 @@ def raw_results_path(tmp_path: Path) -> Path:
     p = tmp_path / "raw_results.json"
     p.write_text(json.dumps(data))
     return p
+
+
+@pytest.fixture
+def predictions_jsonl_path(tmp_path: Path) -> Path:
+    """Two-model synthetic `predictions.jsonl` (per-(model, item) records)."""
+    records = [
+        {"model": "ft-gpt2-small", "item_id": 0, "ppl": 12.0, "errors": 2, "error_types": ["R:VERB:TENSE", "R:VERB:TENSE"]},
+        {"model": "ft-gpt2-small", "item_id": 1, "ppl": 14.0, "errors": 1, "error_types": ["M:DET"]},
+        {"model": "ft-gpt2-small", "item_id": 2, "ppl": 13.5, "errors": 0, "error_types": []},
+        {"model": "ft-gpt2-small", "item_id": 3, "ppl": 11.8, "errors": 3, "error_types": ["R:VERB:TENSE", "M:DET", "U:PUNCT"]},
+        {"model": "ft-gpt2-small", "item_id": 4, "ppl": 15.2, "errors": 1, "error_types": ["R:VERB:TENSE"]},
+        {"model": "ft-pythia-160m", "item_id": 0, "ppl": 22.1, "errors": 2, "error_types": ["M:DET", "R:NOUN:NUM"]},
+        {"model": "ft-pythia-160m", "item_id": 1, "ppl": 19.7, "errors": 1, "error_types": ["R:VERB:TENSE"]},
+        {"model": "ft-pythia-160m", "item_id": 2, "ppl": 20.0, "errors": 0, "error_types": []},
+    ]
+    p = tmp_path / "predictions.jsonl"
+    with p.open("w") as f:
+        for r in records:
+            f.write(json.dumps(r) + "\n")
+    return p

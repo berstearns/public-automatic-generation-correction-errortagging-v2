@@ -19,7 +19,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from eval_scripts._io import load_raw_results, write_csv
+from eval_scripts._io import load_input, write_csv
 
 
 _FIELDS = ["model", "dataset", "error_type", "count", "proportion"]
@@ -52,7 +52,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--out", type=Path, required=True, help="output CSV path")
     args = ap.parse_args(argv)
 
-    data = load_raw_results(args.input)
+    data = load_input(args.input)
     rows = build_rows(data, args.dataset, top_n=args.top_n)
     n = write_csv(args.out, _FIELDS, rows)
     print(f"ERRANT category table: wrote {n} rows to {args.out}")
